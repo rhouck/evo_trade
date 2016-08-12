@@ -7,7 +7,6 @@ to_ret = lambda x: x.div(x.shift())
 
 def get_fwd_ret(df, look_ahead_per):
     df_1 = df.applymap(lambda x: x + 1.)
-    # df_1 = pd.rolling_apply(df_1[::-1], look_ahead_per, lambda x : x.prod())
     df_1 = df_1[::-1].rolling(window=look_ahead_per).apply(func=lambda x : x.prod())[::-1]
     return df_1.applymap(lambda x: x - 1.)
 
@@ -38,16 +37,6 @@ def set_stats():
     mstats.register("max", np.max)
     return mstats
 
-
-# def to_df(px, target):
-#     shape = px.shape
-#     index = target.index
-#     columns = target.columns
-#     df = pd.DataFrame(px, index=index, columns=columns)
-#     return df
-
 def calc_forecast_target_corr(forecast, target):
-    #forecast = to_df(forecast, target)
-    #forecast = forecast.mul(target_vol).dropna(how='all')
     return (pd.concat([forecast.stack(), target.stack()], axis=1)
             .dropna().corr().iloc[0,1])
