@@ -6,3 +6,4 @@ deap
 pygraphviz
 jupyter
 toolz
+dill
