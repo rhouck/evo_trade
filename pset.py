@@ -31,7 +31,7 @@ def change(px, n):
     return px / shift(px, n) - 1.
 
 def rolling_apply(func, px, window):
-    window = int(math.floor(window))
+    window = int(math.floor(window + 1))
     return px.rolling(window=window).apply(func=func)
 
 rfuncs = (('rmean', np.nanmean),
@@ -42,11 +42,11 @@ rfuncs = (('rmean', np.nanmean),
 rfuncs = list(map(lambda x: (x[0], partial(rolling_apply, x[1])), rfuncs))
 
 def rolling_pairwise_corr(px1, px2, window):
-    window = int(math.floor(window))
+    window = int(math.floor(window + 1))
     return px1.rolling(window=window).corr(other=px2)
 
 def rolling_pairwise_cov(px1, px2, window):
-    window = int(math.floor(window))
+    window = int(math.floor(window + 1))
     return px1.rolling(window=window).cov(other=px2)
 
 rpfuncs = (('rpcorr', rolling_pairwise_corr),
