@@ -10,7 +10,7 @@ def load_toolbox(weights, pset, pxs, eval_func, tournsize):
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
     toolbox = base.Toolbox()
-    toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=2, max_=5)
+    toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=2, max_=6)
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("compile", gp.compile, pset=pset)
