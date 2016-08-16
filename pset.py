@@ -69,8 +69,8 @@ def load_pset(names):
     pset.addPrimitive(shift, [pd.DataFrame, float], pd.DataFrame, name='delay')
     pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
 
-    for i in rpfuncs:
-       pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
+    # for i in rpfuncs:
+    #    pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
 
     pset.addEphemeralConstant('rand30', partial(trunc_rand_float, 30), float)
 

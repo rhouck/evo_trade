@@ -34,3 +34,5 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
             with open(checkpoint_fn, 'wb') as f:
                 f.write(dill.dumps(cp, 2))
+
+    return pop, hof, log
