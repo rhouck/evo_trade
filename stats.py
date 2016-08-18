@@ -4,6 +4,7 @@ import numpy as np
 from functools import partial
 from deap import tools
 
+
 def nan_fit_ratio(x):
     total = len(x)
     num_nans = sum([1 for i in x if np.isnan(i)])

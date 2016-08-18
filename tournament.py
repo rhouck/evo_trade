@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import dill
 from deap import algorithms
 
@@ -7,6 +8,8 @@ from deap import algorithms
 def get_seed_state():
     random.seed(0)
     return random.getstate()
+
+is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
                    checkpoint_fn, start_gen, randstate=get_seed_state()):
@@ -25,6 +28,10 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         hof.update(pop)
         record = stats.compile(pop)
         log.record(gen=gen, evals=len(invalid_ind), **record)
+        
+        # filter out all nans
+        pop = [ind for ind in pop if not is_nan(ind)]
+
         pop = toolbox.select(pop, k=len(pop))
         print(log.stream)  
 

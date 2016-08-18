@@ -6,6 +6,7 @@ import pygraphviz as pgv
 from IPython.display import Image
 from deap import gp
 
+
 def draw_individual(ind):
     nodes, edges, labels = gp.graph(ind)
     g = pgv.AGraph()

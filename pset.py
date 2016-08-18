@@ -16,9 +16,9 @@ trunc_rand_float = lambda x: round(random.uniform(0,x),3)
 def xsrank(px):
     return px.rank(axis=1)
 
-oppfuncs = (('add', operator.add),
-            ('sub', operator.sub),
-            ('mul', operator.mul),
+oppfuncs = (('sub', operator.sub),
+            #('add', operator.add),
+            #('mul', operator.mul),
             ('div', operator.div),
             ('min', np.minimum),
             ('max', np.maximum))
@@ -61,8 +61,8 @@ def load_pset(names):
 
     for i in oppfuncs:
         pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame], pd.DataFrame, name=i[0])
-        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfint')
-        #pset.addPrimitive(i[1], [int, pd.DataFrame], pd.DataFrame, name=i[0] + '_intdf')
+        # pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfint')
+        # pset.addPrimitive(i[1], [int, pd.DataFrame], pd.DataFrame, name=i[0] + '_intdf')
     
     for i in rfuncs:
         pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0])  
@@ -70,7 +70,7 @@ def load_pset(names):
     pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
 
     for i in rpfuncs:
-       pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
+        pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
 
     pset.addEphemeralConstant('rand30', partial(trunc_rand_float, 30), float)
 
