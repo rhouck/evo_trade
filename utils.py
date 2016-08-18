@@ -33,7 +33,7 @@ calc_ir = lambda x: (x.mean() * 252.) / (x.std() * math.sqrt(252.))
 xscore = lambda x: x.sub(x.mean(axis=1), axis=0).div(x.std(axis=1), axis=0)
 
 def scale_returns(returns, risk=.05):
-    risk_daily = .05 / math.sqrt(252.)
+    risk_daily = risk / math.sqrt(252.)
     scaler = (risk_daily / returns.std())
     return returns * scaler
 
