@@ -89,7 +89,8 @@ class RiskModel(object):
             raise Exception('returns cannot contain nan rows')
         
         self.returns = returns
-        returns_grouped = returns.ewm(halflife=halflife,ignore_na=True,min_periods=halflife)
+        min_per = int(halflife * .75)
+        returns_grouped = returns.ewm(halflife=halflife,ignore_na=True,min_periods=min_per)
         self.vol = returns_grouped.std().dropna(how='all') 
         self.cov = returns_grouped.cov().dropna(how='all', axis='items')
         self.inv_cov = self.invert_cov(self.cov)    
@@ -108,6 +109,7 @@ class RiskModel(object):
         holdings = {}
         for date in dates:
             inv_cov_full = self.inv_cov.loc[date].dropna(how='all').dropna(how='all', axis=1)
-            alphas_full = alphas.loc[date, inv_cov_full.columns]
+            alphas_full = alphas.loc[date, inv_cov_full.columns].dropna()
+            inv_cov_full = inv_cov_full.loc[alphas_full.index, alphas_full.index]
             holdings[date] = inv_cov_full.dot(alphas_full)
         return pd.DataFrame(holdings).T
