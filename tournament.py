@@ -19,23 +19,22 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
     for gen in range(start_gen, start_gen + ngen):
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
 
-        # Evaluate the individuals with an invalid fitness
+        # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
-        # filter out all nans
-        pop_valid = [ind for ind in pop if not is_nan(ind)]
-
-        hof.update(pop_valid)
+        # log stats
         record = stats.compile(pop)
         log.record(gen=gen, evals=len(invalid_ind), **record)
-        pop = pop_valid
+        print(log.stream)
 
+        # filt invalid and select best inds
+        pop = [ind for ind in pop if not is_nan(ind)]
+        hof.update(pop_valid)
         pop = toolbox.select(pop, k=len(pop))
-        print(log.stream)  
-
+        
         if gen % 10 == 0:
             cp = dict(pop=pop, gen=gen, hof=hof, log=log, 
                       randstate=random.getstate())
