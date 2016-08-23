@@ -72,6 +72,11 @@ def calc_tilt(px):
     px_scaled = px / scale
     return px_scaled.mean().abs().mean()
 
+def aggregate_scores(pop, px):
+    scores = [xscore(get_forecast(ind, px)).stack() for ind in pop]
+    scores = pd.concat(scores, axis=1)
+    return  scores.mean(axis=1).unstack()
+
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
