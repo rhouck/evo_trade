@@ -54,11 +54,6 @@ def scores_to_holdings(rm, scores):
     alphas = scores_xs.mul(rm.vol) * .05
     return rm.calc_holdings(alphas)
  
-def scores_to_ir(rm, target, scores):
-    holdings = scores_to_holdings(rm, scores)
-    returns = calc_port_returns(holdings, target)
-    return calc_ir(returns)
-
 def calc_nan_rows_ratio(df):
     clean = df.dropna(how='all').shape[0]
     full = df.shape[0]
@@ -86,7 +81,7 @@ def aggregate_scores(toolbox, pop, px):
                   cmap(lambda x: x.stack()))
     scores = pd.concat(scores, axis=1)
     return scores.mean(axis=1).unstack()
-    
+
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
