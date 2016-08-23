@@ -32,7 +32,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         # filt invalid and select best inds
         pop = [ind for ind in pop if not is_nan(ind)]
-        hof.update(pop_valid)
+        hof.update(pop)
         pop = toolbox.select(pop, k=len(pop))
         
         if gen % 10 == 0:
