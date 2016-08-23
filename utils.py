@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 import pandas as pd
+from toolz import pipe
+from toolz.curried import map as cmap
 import pygraphviz as pgv
 from IPython.display import Image
 from deap import gp
@@ -72,11 +74,19 @@ def calc_tilt(px):
     px_scaled = px / scale
     return px_scaled.mean().abs().mean()
 
-def aggregate_scores(pop, px):
-    scores = [xscore(get_forecast(ind, px)).stack() for ind in pop]
-    scores = pd.concat(scores, axis=1)
-    return  scores.mean(axis=1).unstack()
+def get_forecast(toolbox, individual, pxs):
+    func = toolbox.compile(expr=individual)
+    return func(*pxs)
 
+def aggregate_scores(toolbox, pop, px):
+    gf = lambda x: get_forecast(toolbox, x, px)
+    scores = pipe(pop,
+                  cmap(gf),
+                  cmap(xscore),
+                  cmap(lambda x: x.stack()))
+    scores = pd.concat(scores, axis=1)
+    return scores.mean(axis=1).unstack()
+    
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
