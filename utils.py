@@ -1,4 +1,5 @@
 import math
+import re
 
 import numpy as np
 import pandas as pd
@@ -25,6 +26,29 @@ def draw_individual(ind):
 def display_individual(ind):
     fn = draw_individual(ind)
     return Image(filename=(fn))
+
+def drop_id_funcs_str(s):
+    p = re.compile("id(.?)\(")
+    ps = p.search(s)
+    if ps:
+        p = ps.group(0)
+        ss = s.split(p, 1)
+        a = ss[0]
+        b = ss[1].replace(')', '', 1)
+        s = a + b
+        return drop_id_funcs_str(s)
+    return s
+
+def drop_id_funcs(ind, toolbox, pset):
+    s = ind.__str__() 
+    s_filt = drop_id_funcs_str(s)
+    if s == s_filt:
+        return ind
+    ind_filt = gp.PrimitiveTree.from_string(s_filt, pset)
+    ind_filt.fitness = toolbox.fitness()
+    if ind.fitness.valid:  
+        ind_filt.fitness.values = ind.fitness.values
+    return ind_filt
 
 first = lambda x: x[0]
 second = lambda x: x[1]

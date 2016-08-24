@@ -8,10 +8,11 @@ from deap import tools
 
 
 def load_toolbox(weights, pset, pxs, eval_func, tournsize, height_range=(2,4)):
-    creator.create("FitnessMax", base.Fitness, weights=weights)
-    creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
+    creator.create("Fitness", base.Fitness, weights=weights)
+    creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
 
     toolbox = base.Toolbox()
+    toolbox.register("fitness", creator.Fitness)
     toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=height_range[0], max_=height_range[1])
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)

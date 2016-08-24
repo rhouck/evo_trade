@@ -4,6 +4,8 @@ import numpy as np
 import dill
 from deap import algorithms
 
+from utils import drop_id_funcs
+
 
 def get_seed_state():
     random.seed(0)
@@ -12,12 +14,13 @@ def get_seed_state():
 is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                   checkpoint_fn, start_gen, randstate=get_seed_state()):
+                   checkpoint_fn, start_gen, pset, randstate=get_seed_state()):
     
     random.setstate(randstate)
     start_len = len(pop)
     for gen in range(start_gen, start_gen + ngen):
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
+        pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
