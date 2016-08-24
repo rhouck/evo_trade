@@ -15,7 +15,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
                    checkpoint_fn, start_gen, randstate=get_seed_state()):
     
     random.setstate(randstate)
-
+    start_len = len(pop)
     for gen in range(start_gen, start_gen + ngen):
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
 
@@ -33,7 +33,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         # filt invalid and select best inds
         pop = [ind for ind in pop if not is_nan(ind)]
         hof.update(pop)
-        pop = toolbox.select(pop, k=len(pop))
+        pop = toolbox.select(pop, k=start_len)
         
         if gen % 10 == 0:
             cp = dict(pop=pop, gen=gen, hof=hof, log=log, 
