@@ -7,7 +7,7 @@ from deap import gp
 from deap import tools
 
 
-def load_toolbox(weights, pset, pxs, eval_func, tournsize, parsimony_size, height_range):
+def load_toolbox(weights, pset, dr, eval_func, tournsize, parsimony_size, height_range):
     creator.create("Fitness", base.Fitness, weights=weights)
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
 
@@ -17,7 +17,7 @@ def load_toolbox(weights, pset, pxs, eval_func, tournsize, parsimony_size, heigh
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("compile", gp.compile, pset=pset)
-    toolbox.register("evaluate", eval_func, pxs=pxs)
+    toolbox.register("evaluate", eval_func, dr=dr)
     #toolbox.register("select", tools.selTournament, tournsize=tournsize)
     toolbox.register("select", tools.selDoubleTournament, fitness_size=tournsize, 
                      parsimony_size=parsimony_size, fitness_first=True)
