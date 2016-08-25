@@ -52,6 +52,10 @@ def rolling_pairwise_cov(px1, px2, window):
 rpfuncs = (('rpcorr', rolling_pairwise_corr),
            ('rpcov', rolling_pairwise_cov))
 
+def change_smooth(px, n, window):
+    px_d = change(px, n)
+    return rolling_apply(np.nanmean, px_d, window)
+
 def load_pset(names):
     inp_dims = [pd.DataFrame for i in range(len(names))]
     pset = gp.PrimitiveSetTyped("MAIN", inp_dims, pd.DataFrame)
@@ -72,7 +76,8 @@ def load_pset(names):
     for i in rpfuncs:
         pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
 
-    pset.addEphemeralConstant('rand30', partial(trunc_rand_float, 30), float)
+    pset.addPrimitive(change_smooth, [pd.DataFrame, float, float], pd.DataFrame, name='ch_sm')  
+    pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
 
     pset.addPrimitive(id, [float], float, name='id')
     pset.addPrimitive(id, [pd.DataFrame], pd.DataFrame, name='id2')
