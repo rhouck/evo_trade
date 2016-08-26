@@ -13,6 +13,20 @@ def get_seed_state():
 
 is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
 
+def checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, randstate):
+    cp = dict(pop=pop, gen=gen, hof=hof, log=log, randstate=randstate)
+    with open(checkpoint_fn, 'wb') as f:
+        f.write(dill.dumps(cp, 2))
+
+def load_checkpoint(checkpoint_fn):
+    cp = dill.load(open(checkpoint_fn, 'r'))
+    pop = cp['pop']
+    gen = cp['gen']
+    hof = cp['hof']
+    log = cp['log']  
+    randstate = cp["randstate"]
+    return pop, start_gen, hof, log, randstate
+
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
                    checkpoint_fn, start_gen, pset, randstate=get_seed_state()):
     
@@ -39,10 +53,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         pop = toolbox.select(pop, k=start_len)
         
         if gen % 10 == 0:
-            cp = dict(pop=pop, gen=gen, hof=hof, log=log, 
-                      randstate=random.getstate())
-
-            with open(checkpoint_fn, 'wb') as f:
-                f.write(dill.dumps(cp, 2))
-
+            checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, 
+                                  random.getstate())
+  
     return pop, hof, log
