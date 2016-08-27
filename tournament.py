@@ -20,12 +20,8 @@ def checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, randstate):
 
 def load_checkpoint(checkpoint_fn):
     cp = dill.load(open(checkpoint_fn, 'r'))
-    pop = cp['pop']
-    gen = cp['gen']
-    hof = cp['hof']
-    log = cp['log']  
-    randstate = cp["randstate"]
-    return pop, start_gen, hof, log, randstate
+    items = ('pop', 'gen', 'hof', 'log', 'randstate')
+    return map(lambda x: cp[x], items) 
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
                    checkpoint_fn, start_gen, pset, randstate=get_seed_state()):

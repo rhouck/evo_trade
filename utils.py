@@ -88,6 +88,8 @@ def calc_two_sided_rel_to(holdings):
     lev = holdings.abs().sum(axis=1)
     return delta / lev
 
+calc_ann_to = lambda hld: calc_two_sided_rel_to(hld).mean() * 252
+
 def calc_tilt(px):
     scale = px.stack().std()
     px_scaled = px / scale
