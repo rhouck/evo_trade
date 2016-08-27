@@ -11,7 +11,7 @@ from deap import gp
 
 id = lambda x: x
 
-trunc_rand_float = lambda x: round(random.uniform(0,x),3)
+trunc_rand_float = lambda x: round(random.uniform(0, x), 3)
 
 # core funcs
 def xsrank(px):
@@ -100,8 +100,8 @@ def load_pset(names):
 
     for i in oppfuncs:
         pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame], pd.DataFrame, name=i[0])
-        # pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfint')
-        # pset.addPrimitive(i[1], [int, pd.DataFrame], pd.DataFrame, name=i[0] + '_intdf')
+        # pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfflt')
+        # pset.addPrimitive(i[1], [float, pd.DataFrame], pd.DataFrame, name=i[0] + '_fltdf')
     
     pset.addPrimitive(shift, [pd.DataFrame, float], pd.DataFrame, name='delay')
     pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
@@ -127,8 +127,8 @@ def load_pset(names):
     
     pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
 
-    dtypes = (float, pd.DataFrame)
-    named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), enumerate(dtypes))
+    dtypes = enumerate((float, pd.DataFrame))
+    named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), dtypes)
     for i in named_dtypes:
         pset.addPrimitive(id, [i[1]], i[1], name=i[0])
 
