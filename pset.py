@@ -50,8 +50,11 @@ def get_exp_window(px, halflife):
     return px.ewm(halflife=halflife, ignore_na=True, 
                   min_periods=int(halflife*.75))
 
-erfuncs = (('ermean', get_exp_window(px, halflife).mean()),
-           ('erstd', get_exp_window(px, halflife).std()),)
+def ermean(px, halflife):
+    return get_exp_window(px, halflife).mean()
+
+def erstd(px, halflife):
+    return get_exp_window(px, halflife).std()
 
 def rolling_pairwise_corr(px1, px2, window):
     window = int(math.floor(window + 1))
@@ -92,8 +95,8 @@ def load_pset(names):
     for i in rfuncs:
         pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0])
 
-    for i in erfuncs:
-        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0])
+    for i in (ermean, erstd):
+        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame)
 
     pset.addPrimitive(shift, [pd.DataFrame, float], pd.DataFrame, name='delay')
     pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
@@ -107,8 +110,10 @@ def load_pset(names):
 
     pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
 
-    pset.addPrimitive(id, [float], float, name='id')
-    pset.addPrimitive(id, [pd.DataFrame], pd.DataFrame, name='id2')
+    dtypes = (float, pd.DataFrame)
+    named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), enumerate(dtypes))
+    for i in named_dtypes:
+        pset.addPrimitive(id, [i[1]], i[1], name=i[0])
 
     args = dict(zip(range(len(names)), names))
     args = keymap(lambda x: 'ARG{0}'.format(x), args)
