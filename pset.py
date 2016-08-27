@@ -44,7 +44,7 @@ rfuncs = (('rmean', np.nanmean),
           ('rmin', np.nanmin),
           ('rtsrank', tsrank),)
 
-rfuncs = list(map(lambda x: (x[0], partial(rolling_apply, x[1])), rfuncs))
+rfuncs = dict(map(lambda x: (x[0], partial(rolling_apply, x[1])), rfuncs))
 
 def get_exp_window(px, halflife):
     return px.ewm(halflife=halflife, ignore_na=True, 
@@ -64,8 +64,8 @@ def rolling_pairwise_cov(px1, px2, window):
     window = int(math.floor(window + 1))
     return px1.rolling(window=window).cov(other=px2)
 
-rpfuncs = (('rpcorr', rolling_pairwise_corr),
-           ('rpcov', rolling_pairwise_cov))
+rpfuncs = dict((('rpcorr', rolling_pairwise_corr),
+                ('rpcov', rolling_pairwise_cov)))
 
 # complex funcs
 def change_smooth(px, n, window):
@@ -80,10 +80,21 @@ def ew_vol_scl(px, halflife):
     px_std = get_exp_window(px, halflife).std()
     return px.div(px_std)
 
+def xs_rank_corr(px1, px2, window):
+    rpx1 = xsrank(px1)
+    rpx2 = xsrank(px2)
+    return rolling_pairwise_corr(rpx1, rpx2, window)
+
+def ts_rank_corr(px1, px2, r_window, c_window):
+    rpx1 = rfucs['rtsrank'](px1, r_window)
+    rpx2 = rfucs['rtsrank'](px2, r_window)
+    return rolling_pairwise_corr(rpx1, rpx2, c_window)
+
 def load_pset(names):
     inp_dims = [pd.DataFrame for i in range(len(names))]
     pset = gp.PrimitiveSetTyped("MAIN", inp_dims, pd.DataFrame)
 
+    # core funcs
     for i in (operator.neg, abs, xsrank):
         pset.addPrimitive(i, [pd.DataFrame,], pd.DataFrame)
 
@@ -92,22 +103,28 @@ def load_pset(names):
         # pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfint')
         # pset.addPrimitive(i[1], [int, pd.DataFrame], pd.DataFrame, name=i[0] + '_intdf')
     
-    for i in rfuncs:
-        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0])
-
-    for i in (ermean, erstd):
-        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame)
-
     pset.addPrimitive(shift, [pd.DataFrame, float], pd.DataFrame, name='delay')
     pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
 
-    for i in rpfuncs:
-        pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
-    pset.addPrimitive(change_smooth, [pd.DataFrame, float, float], pd.DataFrame, name='ch_sm')  
-    
-    for i in (vol_scl, ew_vol_scl):
-        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame)
 
+    # rolling funcs
+    for i in rfuncs.items():
+        pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0])
+
+    for i in (ermean, erstd):
+        pset.addPrimitive(i, [pd.DataFrame, float], pd.DataFrame)
+
+    for i in rpfuncs.items():
+        pset.addPrimitive(i[1], [pd.DataFrame, pd.DataFrame, float], pd.DataFrame, name=i[0])
+    
+
+    # complex funcs
+    pset.addPrimitive(change_smooth, [pd.DataFrame, float, float], pd.DataFrame, name='ch_sm')  
+    for i in (vol_scl, ew_vol_scl):
+        pset.addPrimitive(i, [pd.DataFrame, float], pd.DataFrame)
+    pset.addPrimitive(xs_rank_corr, [pd.DataFrame, pd.DataFrame, float], pd.DataFrame)
+    pset.addPrimitive(ts_rank_corr, [pd.DataFrame, pd.DataFrame, float, float], pd.DataFrame)
+    
     pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
 
     dtypes = (float, pd.DataFrame)
