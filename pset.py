@@ -19,7 +19,7 @@ def xsrank(px):
 
 oppfuncs = (('sub', operator.sub),
             #('add', operator.add),
-            #('mul', operator.mul),
+            ('mul', operator.mul),
             ('div', operator.div),
             ('min', np.minimum),
             ('max', np.maximum))
