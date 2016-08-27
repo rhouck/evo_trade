@@ -86,8 +86,8 @@ def xs_rank_corr(px1, px2, window):
     return rolling_pairwise_corr(rpx1, rpx2, window)
 
 def ts_rank_corr(px1, px2, r_window, c_window):
-    rpx1 = rfucs['rtsrank'](px1, r_window)
-    rpx2 = rfucs['rtsrank'](px2, r_window)
+    rpx1 = rfuncs['rtsrank'](px1, r_window)
+    rpx2 = rfuncs['rtsrank'](px2, r_window)
     return rolling_pairwise_corr(rpx1, rpx2, c_window)
 
 def load_pset(names):
