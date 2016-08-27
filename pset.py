@@ -9,9 +9,11 @@ from toolz.dicttoolz import keymap
 from deap import gp
 
 
-id = lambda x: x
+def idf(x):
+    return x
 
-trunc_rand_float = lambda x: round(random.uniform(0, x), 3)
+def trunc_rand_float(x): 
+    return round(random.uniform(0, x), 3)
 
 # core funcs
 def xsrank(px):
@@ -36,7 +38,8 @@ def rolling_apply(func, px, window):
     window = int(math.floor(window + 1))
     return px.rolling(window=window).apply(func=func)
 
-tsrank = lambda data: data.argsort()[-1] + 1
+def tsrank(data): 
+    return data.argsort()[-1] + 1
 
 rfuncs = (('rmean', np.nanmean),
           ('rstd', np.nanstd),
@@ -130,7 +133,7 @@ def load_pset(names):
     dtypes = enumerate((float, pd.DataFrame))
     named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), dtypes)
     for i in named_dtypes:
-        pset.addPrimitive(id, [i[1]], i[1], name=i[0])
+        pset.addPrimitive(idf, [i[1]], i[1], name=i[0])
 
     args = dict(zip(range(len(names)), names))
     args = keymap(lambda x: 'ARG{0}'.format(x), args)
