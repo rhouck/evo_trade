@@ -7,6 +7,7 @@ import pandas as pd
 from functools import partial
 from toolz.dicttoolz import keymap
 from deap import gp
+from scipy.stats import norm
 
 
 def idf(x):
@@ -83,15 +84,30 @@ def ew_vol_scl(px, halflife):
     px_std = get_exp_window(px, halflife).std()
     return px.div(px_std)
 
-def xs_rank_corr(px1, px2, window):
+def xsrank_corr(px1, px2, window):
     rpx1 = xsrank(px1)
     rpx2 = xsrank(px2)
     return rolling_pairwise_corr(rpx1, rpx2, window)
 
-def ts_rank_corr(px1, px2, r_window, c_window):
+def tsrank_corr(px1, px2, r_window, c_window):
     rpx1 = rfuncs['rtsrank'](px1, r_window)
     rpx2 = rfuncs['rtsrank'](px2, r_window)
     return rolling_pairwise_corr(rpx1, rpx2, c_window)
+
+def rank_as_pct(rank, size):
+    rank /= size
+    max_val = (size - 1.) / size
+    return rank.replace(1, max_val)
+
+def xsrank_norm(px):
+    rank = xsrank(px)
+    rank = rank_as_pct(rank, rank.shape[1])
+    return rank.apply(norm.ppf)
+
+def tsrank_norm(px, window):
+    rank = rfuncs['rtsrank'](px, window)
+    rank = rank_as_pct(rank, window + 1)
+    return rank.apply(norm.ppf)
 
 def load_pset(names):
     inp_dims = [pd.DataFrame for i in range(len(names))]
@@ -125,8 +141,10 @@ def load_pset(names):
     pset.addPrimitive(change_smooth, [pd.DataFrame, float, float], pd.DataFrame, name='ch_sm')  
     for i in (vol_scl, ew_vol_scl):
         pset.addPrimitive(i, [pd.DataFrame, float], pd.DataFrame)
-    pset.addPrimitive(xs_rank_corr, [pd.DataFrame, pd.DataFrame, float], pd.DataFrame)
-    pset.addPrimitive(ts_rank_corr, [pd.DataFrame, pd.DataFrame, float, float], pd.DataFrame)
+    pset.addPrimitive(xsrank_corr, [pd.DataFrame, pd.DataFrame, float], pd.DataFrame)
+    pset.addPrimitive(tsrank_corr, [pd.DataFrame, pd.DataFrame, float, float], pd.DataFrame)
+    pset.addPrimitive(xsrank_norm, [pd.DataFrame,], pd.DataFrame)
+    pset.addPrimitive(tsrank_norm, [pd.DataFrame, float], pd.DataFrame)
     
     pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
 
