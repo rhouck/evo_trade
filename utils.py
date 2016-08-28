@@ -95,6 +95,9 @@ def calc_tilt(px):
     px_scaled = px / scale
     return px_scaled.mean().abs().mean()
 
+def calc_concentration(px):
+    return xscore(px).abs().max(axis=1).mean()
+
 def get_forecast(toolbox, individual, pxs):
     func = toolbox.compile(expr=individual)
     return func(*pxs)
