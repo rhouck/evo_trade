@@ -48,7 +48,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         hof.update(pop)
         pop = toolbox.select(pop, k=start_len)
         
-        if gen % 10 == 0:
+        if (gen + 1) % 5 == 0:
             checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, 
                                   random.getstate())
   
