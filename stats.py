@@ -12,7 +12,7 @@ def nan_fit_ratio(x):
 
 def name_to_int(ind):
     name = ind.__str__()
-    hashed = int(hashlib.sha1(name).hexdigest(), 16)  % (10 ** 8)
+    hashed = int(hashlib.sha1(name).hexdigest(), 16)
     return np.float(hashed)
 
 count_unique = lambda x: float(len(set(x)))
