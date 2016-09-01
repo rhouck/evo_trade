@@ -146,7 +146,7 @@ def load_pset(names):
     pset.addPrimitive(xsrank_norm, [pd.DataFrame,], pd.DataFrame)
     pset.addPrimitive(tsrank_norm, [pd.DataFrame, float], pd.DataFrame)
     
-    pset.addEphemeralConstant('rand60', partial(trunc_rand_float, 60), float)
+    pset.addEphemeralConstant('rand100', partial(trunc_rand_float, 100), float)
 
     dtypes = enumerate((float, pd.DataFrame))
     named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), dtypes)
