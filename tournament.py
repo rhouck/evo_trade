@@ -24,7 +24,7 @@ def load_checkpoint(checkpoint_fn):
     return map(lambda x: cp[x], items) 
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                   checkpoint_fn, start_gen, pset, randstate=get_seed_state()):
+                   checkpoint_fn, start_gen, pset, randstate=get_seed_state(), cp_freq=5):
     
     random.setstate(randstate)
     start_len = len(pop)
@@ -48,7 +48,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         hof.update(pop)
         pop = toolbox.select(pop, k=start_len)
         
-        if (gen + 1) % 5 == 0:
+        if (gen + 1) % cp_freq == 0:
             checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, 
                                   random.getstate())
   
