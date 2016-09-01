@@ -34,6 +34,9 @@ def shift(px, n):
 def change(px, n):
     return px / shift(px, n) - 1.
 
+def diff(px, n):
+    return px.diff(n)
+
 # rolling funcs
 def rolling_apply(func, px, window):
     window = int(math.floor(window + 1))
@@ -74,6 +77,10 @@ rpfuncs = dict((('rpcorr', rolling_pairwise_corr),
 # complex funcs
 def change_smooth(px, n, window):
     px_d = change(px, n)
+    return rolling_apply(np.nanmean, px_d, window)
+
+def diff_smooth(px, n, window):
+    px_d = diff(px, n)
     return rolling_apply(np.nanmean, px_d, window)
 
 def vol_scl(px, window):
@@ -122,9 +129,8 @@ def load_pset(names):
         # pset.addPrimitive(i[1], [pd.DataFrame, float], pd.DataFrame, name=i[0] + '_dfflt')
         # pset.addPrimitive(i[1], [float, pd.DataFrame], pd.DataFrame, name=i[0] + '_fltdf')
     
-    pset.addPrimitive(shift, [pd.DataFrame, float], pd.DataFrame, name='delay')
-    pset.addPrimitive(change, [pd.DataFrame, float], pd.DataFrame, name='change')
-
+    for i in (shift, change, diff):
+        pset.addPrimitive(i, [pd.DataFrame, float], pd.DataFrame)
 
     # rolling funcs
     for i in rfuncs.items():
@@ -138,7 +144,9 @@ def load_pset(names):
     
 
     # complex funcs
-    pset.addPrimitive(change_smooth, [pd.DataFrame, float, float], pd.DataFrame, name='ch_sm')  
+    for i in (change_smooth, diff_smooth):
+        pset.addPrimitive(i, [pd.DataFrame, float, float], pd.DataFrame)  
+    
     for i in (vol_scl, ew_vol_scl):
         pset.addPrimitive(i, [pd.DataFrame, float], pd.DataFrame)
     pset.addPrimitive(xsrank_corr, [pd.DataFrame, pd.DataFrame, float], pd.DataFrame)
