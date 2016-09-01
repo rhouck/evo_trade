@@ -116,6 +116,16 @@ def tsrank_norm(px, window):
     rank = rank_as_pct(rank, window + 1)
     return rank.apply(norm.ppf)
 
+def chg_intct(px, px2, n, n2):
+    a = change(px, n)
+    b = change(px2, n2)
+    return a * b
+
+def diff_intct(px, px2, n, n2):
+    a = diff(px, n)
+    b = diff(px2, n2)
+    return a * b
+
 def load_pset(names):
     inp_dims = [pd.DataFrame for i in range(len(names))]
     pset = gp.PrimitiveSetTyped("MAIN", inp_dims, pd.DataFrame)
@@ -154,6 +164,9 @@ def load_pset(names):
     pset.addPrimitive(xsrank_norm, [pd.DataFrame,], pd.DataFrame)
     pset.addPrimitive(tsrank_norm, [pd.DataFrame, float], pd.DataFrame)
     
+    for i in (chg_intct, diff_intct):
+        pset.addPrimitive(i, [pd.DataFrame, pd.DataFrame, float, float], pd.DataFrame)
+
     pset.addEphemeralConstant('rand100', partial(trunc_rand_float, 100), float)
 
     dtypes = enumerate((float, pd.DataFrame))
