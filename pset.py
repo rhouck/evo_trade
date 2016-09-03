@@ -126,7 +126,7 @@ def diff_intct(px, px2, n, n2):
     b = diff(px2, n2)
     return a * b
 
-def load_pset(names):
+def load_pset(names, max_float):
     inp_dims = [pd.DataFrame for i in range(len(names))]
     pset = gp.PrimitiveSetTyped("MAIN", inp_dims, pd.DataFrame)
 
@@ -167,7 +167,7 @@ def load_pset(names):
     for i in (chg_intct, diff_intct):
         pset.addPrimitive(i, [pd.DataFrame, pd.DataFrame, float, float], pd.DataFrame)
 
-    pset.addEphemeralConstant('rand100', partial(trunc_rand_float, 100), float)
+    pset.addEphemeralConstant('rand{0}'.format(max_float), partial(trunc_rand_float, max_float), float)
 
     dtypes = enumerate((float, pd.DataFrame))
     named_dtypes = map(lambda x: ('id' + str(x[0]), x[1]), dtypes)
