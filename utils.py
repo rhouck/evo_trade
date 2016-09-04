@@ -97,8 +97,8 @@ def calc_tilt(px):
     px_scaled = px / scale
     return px_scaled.mean().abs().mean()
 
-def calc_concentration(px):
-    return xscore(px).abs().max(axis=1).mean()
+# def calc_concentration(px):
+#     return xscore(px).abs().max(axis=1).mean()
 
 def apply_xscore_scipy(func, scores):
     data = xscore(scores).stack().values
@@ -111,15 +111,24 @@ def get_forecast(toolbox, individual, pxs):
     func = toolbox.compile(expr=individual)
     return func(*pxs)
 
+def get_ind_counts(pop):
+    df = pd.DataFrame([(i, i.__str__()) for i in pop])
+    df.columns = ['ind', 'str']
+    counts = df.groupby('str').count()['ind'].to_dict()
+    df['counts'] = df['str'].map(lambda x: counts[x])
+    return list(df.drop_duplicates('str')[['ind', 'counts']].values)
+
 def aggregate_scores(toolbox, pop, px):
+    pop_counts = get_ind_counts(pop)
     gf = lambda x: get_forecast(toolbox, x, px)
-    scores = pipe(pop,
-                  cmap(gf),
-                  cmap(xscore),
-                  cmap(lambda x: x.stack()))
+    scores = pipe(pop_counts,
+                  cmap(lambda x: (gf(x[0]), x[1])),
+                  cmap(lambda x: (xscore(x[0]), x[1])),
+                  cmap(lambda x: (x[0].stack(), x[1])),
+                  cmap(lambda x: pd.concat([x[0] for i in range(x[1])], axis=1)),)
     scores = pd.concat(scores, axis=1)
     return scores.mean(axis=1).unstack()
-
+    
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
