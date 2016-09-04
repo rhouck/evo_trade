@@ -1,4 +1,5 @@
 import random
+from itertools import chain
 
 import numpy as np
 import dill
@@ -10,6 +11,19 @@ from utils import drop_id_funcs
 def get_seed_state():
     random.seed(0)
     return random.getstate()
+
+def upsample_pop(pop, size):
+    if len(pop) > size:
+        raise Exception('`pop` already larger than `size`')
+
+    full = size / len(pop)
+    full_pops = [pop for i in range(full)]
+    full_pops = list(chain(*full_pops))
+    
+    n_extra = size % len(pop)
+    extra = list(np.random.choice(pop, size=n_extra, replace=False))
+    
+    return full_pops + extra
 
 is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
 
@@ -38,8 +52,9 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
-        # filt invalid and select best inds
+        # filt invalid and upsample to replace invalid inds
         pop = [ind for ind in pop if not is_nan(ind)]
+        pop = upsample_pop(pop, start_len)
 
         # log stats
         record = stats.compile(pop)
