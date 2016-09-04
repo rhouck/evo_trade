@@ -12,6 +12,8 @@ def get_seed_state():
     random.seed(0)
     return random.getstate()
 
+is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
+
 def upsample_pop(pop, size):
     if len(pop) > size:
         raise Exception('`pop` already larger than `size`')
@@ -24,8 +26,6 @@ def upsample_pop(pop, size):
     extra = list(np.random.choice(pop, size=n_extra, replace=False))
     
     return full_pops + extra
-
-is_nan = lambda ind: any(map(np.isnan, ind.fitness.values))
 
 def checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, randstate):
     cp = dict(pop=pop, gen=gen, hof=hof, log=log, randstate=randstate)
@@ -56,14 +56,14 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         pop = [ind for ind in pop if not is_nan(ind)]
         pop = upsample_pop(pop, start_len)
 
+        pop = toolbox.select(pop, k=start_len)
+        
         # log stats
         record = stats.compile(pop)
         hof.update(pop)
         log.record(gen=gen, evals=len(invalid_ind), **record)
         print(log.stream)
 
-        pop = toolbox.select(pop, k=start_len)
-        
         if (gen + 1) % cp_freq == 0:
             checkpoint_tournament(checkpoint_fn, pop, gen, hof, log, 
                                   random.getstate())
