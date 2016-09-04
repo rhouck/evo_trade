@@ -1,8 +1,10 @@
 import math
 import re
+from functools import partial
 
 import numpy as np
 import pandas as pd
+import scipy.stats
 from toolz import pipe
 from toolz.curried import map as cmap
 import pygraphviz as pgv
@@ -97,6 +99,13 @@ def calc_tilt(px):
 
 def calc_concentration(px):
     return xscore(px).abs().max(axis=1).mean()
+
+def apply_xscore_scipy(func, scores):
+    data = xscore(scores).stack().values
+    return float(abs(func(data)))
+
+get_scores_skew = partial(apply_xscore_scipy, scipy.stats.mstats.skew)
+get_scores_kurt = partial(apply_xscore_scipy, scipy.stats.mstats.kurtosis)
 
 def get_forecast(toolbox, individual, pxs):
     func = toolbox.compile(expr=individual)
