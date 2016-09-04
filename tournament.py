@@ -38,14 +38,15 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
+        # filt invalid and select best inds
+        pop = [ind for ind in pop if not is_nan(ind)]
+
         # log stats
         record = stats.compile(pop)
+        hof.update(pop)
         log.record(gen=gen, evals=len(invalid_ind), **record)
         print(log.stream)
 
-        # filt invalid and select best inds
-        pop = [ind for ind in pop if not is_nan(ind)]
-        hof.update(pop)
         pop = toolbox.select(pop, k=start_len)
         
         if (gen + 1) % cp_freq == 0:
