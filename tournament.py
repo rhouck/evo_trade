@@ -2,6 +2,7 @@ import random
 from itertools import chain
 
 import numpy as np
+import pandas as pd
 import dill
 from deap import algorithms
 
@@ -78,10 +79,12 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         if gen:
             pop.extend(pop_start)
-
             n = count_unique([name_to_int(i) for i in pop])
             print('pop combo:\t{0}\t{1}'.format(len(pop), n))
 
+        # drop duplicates
+        pop = list(pd.DataFrame([(i, i.__str__()) for i in pop]).drop_duplicates(1)[0])
+        
         pop = toolbox.select(pop, k=start_len)
 
         n = count_unique([name_to_int(i) for i in pop])
