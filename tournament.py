@@ -56,8 +56,8 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         
         if gen:
             pop_start = [ind for ind in pop]
-            #n = count_unique([name_to_int(i) for i in pop_start])
-            #print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
+            n = count_unique([name_to_int(i) for i in pop_start])
+            print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
 
 
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
@@ -73,19 +73,19 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         pop = [ind for ind in pop if not is_nan(ind)]
         #pop = upsample_pop(pop, start_len)
         
-        #n = count_unique([name_to_int(i) for i in pop])
-        #print('new pop:\t{0}\t{1}'.format(len(pop), n))
+        n = count_unique([name_to_int(i) for i in pop])
+        print('new pop:\t{0}\t{1}'.format(len(pop), n))
 
         if gen:
             pop.extend(pop_start)
 
-            #n = count_unique([name_to_int(i) for i in pop])
-            #print('pop combo:\t{0}\t{1}'.format(len(pop), n))
+            n = count_unique([name_to_int(i) for i in pop])
+            print('pop combo:\t{0}\t{1}'.format(len(pop), n))
 
         pop = toolbox.select(pop, k=start_len)
 
-        #n = count_unique([name_to_int(i) for i in pop])
-        #print('sel pop:\t{0}\t{1}'.format(len(pop), n))
+        n = count_unique([name_to_int(i) for i in pop])
+        print('sel pop:\t{0}\t{1}'.format(len(pop), n))
 
         # log stats
         record = stats.compile(pop)
