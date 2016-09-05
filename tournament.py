@@ -37,12 +37,29 @@ def load_checkpoint(checkpoint_fn):
     items = ('pop', 'gen', 'hof', 'log', 'randstate')
     return map(lambda x: cp[x], items) 
 
+
+import hashlib
+def name_to_int(ind):
+    name = ind.__str__()
+    hashed = int(hashlib.sha1(name).hexdigest(), 16)
+    return np.float(hashed)
+count_unique = lambda x: float(len(set(x)))
+
+
+
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                   checkpoint_fn, start_gen, pset, randstate=get_seed_state(), cp_freq=5):
+                   checkpoint_fn, start_gen, pset, randstate=get_seed_state(), cp_freq=5, seed_scale=3):
     
     random.setstate(randstate)
-    start_len = len(pop)
+    start_len = len(pop) / seed_scale
     for gen in range(start_gen, start_gen + ngen):
+        
+        if gen:
+            pop_start = [ind for ind in pop]
+            #n = count_unique([name_to_int(i) for i in pop_start])
+            #print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
+
+
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
         pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
 
@@ -54,10 +71,22 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         # filt invalid and upsample to replace invalid inds
         pop = [ind for ind in pop if not is_nan(ind)]
-        pop = upsample_pop(pop, start_len)
+        #pop = upsample_pop(pop, start_len)
+        
+        #n = count_unique([name_to_int(i) for i in pop])
+        #print('new pop:\t{0}\t{1}'.format(len(pop), n))
+
+        if gen:
+            pop.extend(pop_start)
+
+            #n = count_unique([name_to_int(i) for i in pop])
+            #print('pop combo:\t{0}\t{1}'.format(len(pop), n))
 
         pop = toolbox.select(pop, k=start_len)
-        
+
+        #n = count_unique([name_to_int(i) for i in pop])
+        #print('sel pop:\t{0}\t{1}'.format(len(pop), n))
+
         # log stats
         record = stats.compile(pop)
         hof.update(pop)
