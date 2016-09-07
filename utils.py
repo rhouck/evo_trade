@@ -118,17 +118,10 @@ def get_ind_counts(pop):
     df['counts'] = df['str'].map(lambda x: counts[x])
     return list(df.drop_duplicates('str')[['ind', 'counts']].values)
 
-def aggregate_scores(toolbox, pop, px):
-    pop_counts = get_ind_counts(pop)
-    gf = lambda x: get_forecast(toolbox, x, px)
-    scores = pipe(pop_counts,
-                  cmap(lambda x: (gf(x[0]), x[1])),
-                  cmap(lambda x: (xscore(x[0]), x[1])),
-                  cmap(lambda x: (x[0].stack(), x[1])),
-                  cmap(lambda x: pd.concat([x[0] for i in range(x[1])], axis=1)),)
-    scores = pd.concat(scores, axis=1)
-    return scores.mean(axis=1).unstack()
-    
+def aggregate_scores(pop):
+    return (pd.concat([i.scores.stack() for i in pop], axis=1)
+            .mean(axis=1).unstack())
+                
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
