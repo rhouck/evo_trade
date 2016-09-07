@@ -105,8 +105,8 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
 
 def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                   checkpoint_fn, start_gen, pset, cp_freq, seed_scale, randstate=get_seed_state()):
-    
+                      checkpoint_fn, start_gen, pset, cp_freq, randstate=get_seed_state()):
+
     random.setstate(randstate)
     start_len = len(pop)
     for gen in range(start_gen, start_gen + ngen):
@@ -122,7 +122,8 @@ def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        agg_pops = [agg_pop_start for i in range(len(invalid_ind))]
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind, agg_pops)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit['objectives']
             for i in ('scores', 'holdings'):
