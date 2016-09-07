@@ -6,7 +6,7 @@ import pandas as pd
 import dill
 from deap import algorithms
 
-from utils import drop_id_funcs
+from utils import drop_id_funcs, aggregate_scores
 
 
 def get_seed_state():
@@ -55,20 +55,23 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
     start_len = len(pop) / seed_scale
     for gen in range(start_gen, start_gen + ngen):
         
-        if gen:
-            pop_start = [ind for ind in pop]
-            #n = count_unique([name_to_int(i) for i in pop_start])
-            #print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
-
-
-        #pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
-        #pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
+        
+        pop_start = [ind for ind in pop]
+        #n = count_unique([name_to_int(i) for i in pop_start])
+        #print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
+        pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
+        pop.extend(pop_start)
+        #n = count_unique([name_to_int(i) for i in pop])
+        #print('pop combo:\t{0}\t{1}'.format(len(pop), n))
+        pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+            ind.fitness.values = fit['objectives']
+            for i in ('scores', 'holdings'):
+                setattr(ind, i, fit[i])
 
         # filt invalid and upsample to replace invalid inds
         pop = [ind for ind in pop if not is_nan(ind)]
@@ -77,10 +80,7 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         #n = count_unique([name_to_int(i) for i in pop])
         #print('new pop:\t{0}\t{1}'.format(len(pop), n))
 
-        if gen:
-            pop.extend(pop_start)
-            #n = count_unique([name_to_int(i) for i in pop])
-            #print('pop combo:\t{0}\t{1}'.format(len(pop), n))
+        
 
         # drop duplicates
         pop = list(pd.DataFrame([(i, i.__str__()) for i in pop]).drop_duplicates(1)[0])
