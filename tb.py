@@ -17,7 +17,7 @@ def load_toolbox(weights, pset, dr, eval_func, tournsize, parsimony_size, height
     toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("compile", gp.compile, pset=pset)
-    toolbox.register("evaluate", eval_func, dr=dr)
+    toolbox.register("evaluate", eval_func, dr)
     toolbox.register("select", tools.selBest)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=1)#height_range[1])
