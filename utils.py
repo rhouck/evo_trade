@@ -118,8 +118,8 @@ def get_ind_counts(pop):
     df['counts'] = df['str'].map(lambda x: counts[x])
     return list(df.drop_duplicates('str')[['ind', 'counts']].values)
 
-def aggregate_scores(pop):
-    return (pd.concat([i.scores.stack() for i in pop], axis=1)
+def aggregate_attr(pop, attr):
+    return (pd.concat([getattr(i, attr).stack() for i in pop], axis=1)
             .mean(axis=1).unstack())
                 
 class RiskModel(object):
