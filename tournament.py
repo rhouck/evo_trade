@@ -39,13 +39,12 @@ def load_checkpoint(checkpoint_fn):
     return map(lambda x: cp[x], items) 
 
 
-import hashlib
-def name_to_int(ind):
-    name = ind.__str__()
-    hashed = int(hashlib.sha1(name).hexdigest(), 16)
-    return np.float(hashed)
-count_unique = lambda x: float(len(set(x)))
-
+# import hashlib
+# def name_to_int(ind):
+#     name = ind.__str__()
+#     hashed = int(hashlib.sha1(name).hexdigest(), 16)
+#     return np.float(hashed)
+# count_unique = lambda x: float(len(set(x)))
 
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
@@ -115,6 +114,8 @@ def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         pop_start = [ind for ind in pop]
         agg_pop_start = {i: aggregate_attr(pop, i) for i in ( 'scores','holdings')}
         agg_pop_start['len'] = len(pop)
+        for i in pop_start:
+            setattr(i, 'fitness', toolbox.fitness())
 
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
         pop.extend(pop_start)
