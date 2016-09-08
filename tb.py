@@ -7,7 +7,7 @@ from deap import gp
 from deap import tools
 
 
-def load_toolbox(weights, pset, dr, eval_func, tournsize, parsimony_size, height_range):
+def load_toolbox(weights, pset, dr, eval_func, height_range):
     creator.create("Fitness", base.Fitness, weights=weights)
     creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
 
