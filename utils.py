@@ -50,11 +50,6 @@ def drop_id_funcs(toolbox, pset, ind):
     ind_filt.fitness = toolbox.fitness()
     if ind.fitness.valid:  
         ind_filt.fitness.values = ind.fitness.values
-    # for i in ('scores', 'holdings'):
-    #     try:
-    #         setattr(ind_filt, i, getattr(ind, i))
-    #     except:
-    #         pass
     return ind_filt
 
 first = lambda x: x[0]
