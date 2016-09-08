@@ -1,4 +1,5 @@
 import random
+import copy
 from itertools import chain
 
 import numpy as np
@@ -46,6 +47,15 @@ def load_checkpoint(checkpoint_fn):
 #     return np.float(hashed)
 # count_unique = lambda x: float(len(set(x)))
 
+def strip_ind(toolbox, ind):
+    ind_new = copy.deepcopy(ind)
+    for i in ('scores', 'holdings'):
+        try:
+            delattr(ind_new, i)
+        except:
+            pass
+    ind_new.fitness = toolbox.fitness()
+    return ind_new
 
 def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
                    checkpoint_fn, start_gen, pset, cp_freq, seed_scale, randstate=get_seed_state()):
@@ -57,13 +67,10 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         
         pop_start = [ind for ind in pop]
 
-        #n = count_unique([name_to_int(i) for i in pop_start])
-        #print('pop_start:\t{0}\t{1}'.format(len(pop_start), n))
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
+        pop = [strip_ind(toolbox, ind) for ind in pop]
         pop.extend(pop_start)
-        #n = count_unique([name_to_int(i) for i in pop])
-        #print('pop combo:\t{0}\t{1}'.format(len(pop), n))
-        pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
+        pop = [drop_id_funcs(toolbox, pset, ind) for ind  in pop]
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
@@ -76,19 +83,11 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
         # filt invalid and upsample to replace invalid inds
         pop = [ind for ind in pop if not is_nan(ind)]
         #pop = upsample_pop(pop, start_len)
-        
-        #n = count_unique([name_to_int(i) for i in pop])
-        #print('new pop:\t{0}\t{1}'.format(len(pop), n))
-
-        
 
         # drop duplicates
         pop = list(pd.DataFrame([(i, i.__str__()) for i in pop]).drop_duplicates(1)[0])
         
         pop = toolbox.select(pop, k=start_len)
-
-        #n = count_unique([name_to_int(i) for i in pop])
-        #print('sel pop:\t{0}\t{1}'.format(len(pop), n))
 
         # log stats
         record = stats.compile(pop)
@@ -101,7 +100,6 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
                                   random.getstate())
   
     return pop, hof, log
-
 
 def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
                       checkpoint_fn, start_gen, pset, cp_freq, randstate=get_seed_state()):
@@ -118,8 +116,9 @@ def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
             setattr(i, 'fitness', toolbox.fitness())
 
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
+        pop = [strip_ind(toolbox, ind) for ind in pop]
         pop.extend(pop_start)
-        pop = [drop_id_funcs(ind, toolbox, pset) for ind  in pop]
+        pop = [drop_id_funcs(toolbox, pset, ind) for ind  in pop]
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
