@@ -39,14 +39,6 @@ def load_checkpoint(checkpoint_fn):
     items = ('pop', 'gen', 'hof', 'log', 'randstate')
     return map(lambda x: cp[x], items) 
 
-
-# import hashlib
-# def name_to_int(ind):
-#     name = ind.__str__()
-#     hashed = int(hashlib.sha1(name).hexdigest(), 16)
-#     return np.float(hashed)
-# count_unique = lambda x: float(len(set(x)))
-
 def strip_ind(toolbox, ind):
     ind_new = copy.deepcopy(ind)
     for i in ('scores', 'holdings'):
@@ -69,8 +61,10 @@ def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
         pop = [strip_ind(toolbox, ind) for ind in pop]
-        pop.extend(pop_start)
         pop = [drop_id_funcs(toolbox, pset, ind) for ind  in pop]
+
+        pop.extend(pop_start)
+        
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]
@@ -117,8 +111,10 @@ def run_add_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
 
         pop = algorithms.varAnd(pop, toolbox, cxpb=cxpb, mutpb=mutpb)
         pop = [strip_ind(toolbox, ind) for ind in pop]
-        pop.extend(pop_start)
         pop = [drop_id_funcs(toolbox, pset, ind) for ind  in pop]
+        
+        pop.extend(pop_start)
+        
 
         # evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in pop if not ind.fitness.valid]

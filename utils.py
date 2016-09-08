@@ -41,7 +41,7 @@ def drop_id_funcs_str(s):
         return drop_id_funcs_str(s)
     return s
 
-def drop_id_funcs(ind, toolbox, pset):
+def drop_id_funcs(toolbox, pset, ind):
     s = ind.__str__() 
     s_filt = drop_id_funcs_str(s)
     if s == s_filt:
@@ -50,6 +50,11 @@ def drop_id_funcs(ind, toolbox, pset):
     ind_filt.fitness = toolbox.fitness()
     if ind.fitness.valid:  
         ind_filt.fitness.values = ind.fitness.values
+    # for i in ('scores', 'holdings'):
+    #     try:
+    #         setattr(ind_filt, i, getattr(ind, i))
+    #     except:
+    #         pass
     return ind_filt
 
 first = lambda x: x[0]
