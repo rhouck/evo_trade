@@ -7,28 +7,31 @@ import pandas as pd
 import scipy.stats
 from toolz import pipe, compose
 from toolz.curried import map as cmap
-import pygraphviz as pgv
-from IPython.display import Image
 from deap import gp
 
+try:
+    import pygraphviz as pgv
+    from IPython.display import Image
 
-def draw_individual(ind):
-    nodes, edges, labels = gp.graph(ind)
-    g = pgv.AGraph()
-    g.add_nodes_from(nodes)
-    g.add_edges_from(edges)
-    g.layout(prog="dot")
-    for i in nodes:
-        n = g.get_node(i)
-        n.attr["label"] = labels[i]
-    fn = "data/graphs/tree.png"
-    g.draw(fn)
-    return fn
+    def draw_individual(ind):
+        nodes, edges, labels = gp.graph(ind)
+        g = pgv.AGraph()
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)
+        g.layout(prog="dot")
+        for i in nodes:
+            n = g.get_node(i)
+            n.attr["label"] = labels[i]
+        fn = "data/graphs/tree.png"
+        g.draw(fn)
+        return fn
 
-def display_individual(ind):
-    fn = draw_individual(ind)
-    return Image(filename=(fn))
-
+    def display_individual(ind):
+        fn = draw_individual(ind)
+        return Image(filename=(fn))
+except:
+    pass
+    
 def drop_id_funcs_str(s):
     p = re.compile("id(.?)\(")
     ps = p.search(s)
@@ -96,9 +99,6 @@ def calc_tilt(px):
     scale = px.stack().std()
     px_scaled = px / scale
     return px_scaled.mean().abs().mean()
-
-# def calc_concentration(px):
-#     return xscore(px).abs().max(axis=1).mean()
 
 def apply_xscore_scipy(func, scores):
     data = xscore(scores).stack().values
