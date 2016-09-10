@@ -39,8 +39,8 @@ def load_checkpoint(checkpoint_fn):
     items = ('pop', 'gen', 'hof', 'log', 'randstate')
     return map(lambda x: cp[x], items) 
 
-def run_kbest_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, checkpoint_fn, 
-                         start_gen, pset, cp_freq, seed_scale, randstate, opt_func):
+def run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, checkpoint_fn, 
+                   start_gen, pset, cp_freq, seed_scale, randstate, opt_func):
     
     random.setstate(randstate)
     start_len = len(pop) / seed_scale
@@ -84,9 +84,9 @@ def run_std_tourn(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
                   randstate=get_seed_state(), format_new_ind=lambda x: x):
     
     opt_func = partial(optimize_inds, toolbox, cxpb, mutpb, format_new_ind)
-    return run_kbest_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                                checkpoint_fn, start_gen, pset, cp_freq, seed_scale, 
-                                randstate, opt_func)
+    return run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
+                          checkpoint_fn, start_gen, pset, cp_freq, seed_scale, 
+                          randstate, opt_func)
 
 
 def optimize_agg(toolbox, cxpb, mutpb, format_new_ind, agg_func, pop, gen):
@@ -109,6 +109,6 @@ def run_add_tourn(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log,
                   randstate=get_seed_state(), format_new_ind=lambda x: x):
     
     opt_func = partial(optimize_agg, toolbox, cxpb, mutpb, format_new_ind, agg_func)
-    return run_kbest_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
-                                checkpoint_fn, start_gen, pset, cp_freq, 1, 
-                                randstate, opt_func)
+    return run_tournament(pop, toolbox, cxpb, mutpb, ngen, stats, hof, log, 
+                          checkpoint_fn, start_gen, pset, cp_freq, 1, 
+                          randstate, opt_func)
