@@ -5,7 +5,7 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import scipy.stats
-from toolz import pipe
+from toolz import pipe, compose
 from toolz.curried import map as cmap
 import pygraphviz as pgv
 from IPython.display import Image
@@ -118,10 +118,13 @@ def get_ind_counts(pop):
     df['counts'] = df['str'].map(lambda x: counts[x])
     return list(df.drop_duplicates('str')[['ind', 'counts']].values)
 
-def aggregate_attr(pop, attr):
-    return (pd.concat([getattr(i, attr).stack() for i in pop], axis=1)
+def aggregate_attr(pop, attr, transform=lambda x: x):
+    get_vals = lambda x: getattr(x, attr)
+    stack = lambda x: x.stack()
+    func = compose(stack, transform, get_vals)
+    return (pd.concat([func(i) for i in pop], axis=1)
             .mean(axis=1).unstack())
-                
+
 class RiskModel(object):
     
     def __init__(self, returns, halflife=252):
